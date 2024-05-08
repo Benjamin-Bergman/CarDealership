@@ -6,14 +6,24 @@ package com.pluralsight;
 
 import java.io.*;
 
+/**
+ * Represents a user interface for interacting with a {@link Dealership}.
+ */
+@SuppressWarnings("FeatureEnvy")
 public final class DealershipUI {
     private static final File FILE_PATH = new File("inventory.csv");
     private final Dealership dealership;
 
+    /**
+     * Creates a new instance of the UI.
+     */
     public DealershipUI() {
         dealership = new FileBackedDealership(new Dealership("Default_Name", "Default_Address", "Default_Phone"), FILE_PATH);
     }
 
+    /**
+     * Runs the UI.
+     */
     public void display() {
         System.out.println(dealership.getName());
         System.out.println(dealership.getAddress());

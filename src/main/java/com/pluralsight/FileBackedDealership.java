@@ -8,11 +8,21 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.*;
 
+/**
+ * Decorates a {@link Dealership} with file-saving semantics.
+ */
 public class FileBackedDealership extends Dealership {
     private final File filePath;
     private final Dealership wrapped;
     private final String name, address, phone;
 
+    /**
+     * Creates a new FileBackedDealership.
+     * Note that this replaces the contents of {@code wrapped} with the contents of the file.
+     *
+     * @param wrapped  The Dealership to decorate
+     * @param filePath The File to load from and save to
+     */
     public FileBackedDealership(Dealership wrapped, File filePath) {
         super(null, null, null);
         this.wrapped = wrapped;
@@ -92,6 +102,7 @@ public class FileBackedDealership extends Dealership {
         }
     }
 
+    @SuppressWarnings("FeatureEnvy")
     private static String serialize(Vehicle v) {
         return "%d|%d|%s|%s|%s|%s|%d|%.2f".formatted(
             v.vin(), v.year(),
@@ -121,21 +132,21 @@ public class FileBackedDealership extends Dealership {
     }
 
     @Override
-    public void add(Vehicle v) {
-        wrapped.add(v);
+    public void add(Vehicle vehicle) {
+        wrapped.add(vehicle);
         try (FileWriter fw = new FileWriter(filePath, true);
              BufferedWriter bw = new BufferedWriter(fw)) {
             bw.newLine();
-            bw.write(serialize(v));
+            bw.write(serialize(vehicle));
         }
     }
 
     @Override
-    public void addAll(Collection<Vehicle> vs) {
-        wrapped.addAll(vs);
+    public void addAll(Collection<Vehicle> vehicles) {
+        wrapped.addAll(vehicles);
         try (FileWriter fw = new FileWriter(filePath, true);
              BufferedWriter bw = new BufferedWriter(fw)) {
-            for (var v : vs) {
+            for (var v : vehicles) {
                 bw.newLine();
                 bw.write(serialize(v));
             }
@@ -143,8 +154,8 @@ public class FileBackedDealership extends Dealership {
     }
 
     @Override
-    public boolean remove(Vehicle v) {
-        var success = wrapped.remove(v);
+    public boolean remove(Vehicle vehicle) {
+        var success = wrapped.remove(vehicle);
         if (success) writeAll();
         return success;
     }
