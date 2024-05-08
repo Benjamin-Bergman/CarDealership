@@ -1,0 +1,78 @@
+@startuml
+class Program {
++ {static} void main()
+}
+class DealershipUI {
+- Dealership
+- Scanner
++ DealershipUI(Dealership)
++ void display()
+}
+together {
+    interface Dealership {
+    + {abstract} String getPhone()
+    + {abstract} String getAddress()
+    + {abstract} String getDisplayName()
+    + {abstract} List<Vehicle> getAllVehicles()
+    + {abstract} void add(Vehicle)
+    + {abstract} void addAll(Collection<Vehicle>)
+    + {abstract} boolean remove(Vehicle)
+    + {abstract} void clear()
+    }
+    class BasicDealership implements Dealership {
+    - String displayName
+    - String address
+    - String phone
+    - List<Vehicle> inventory
+    --
+    + BasicDealership(String, String, String)
+    ..
+    + {abstract} {method} overrides
+    }
+    class FileBackedDealership Implements Dealership {
+    - File filePath
+    - Dealership wrapped
+    - String displayName
+    - String address
+    - String phone
+    --
+    + FileBackedDealership(Dealership, File)
+    ..
+    + {abstract} {method} overrides
+    }
+}
+class Vehicle << (R,orange) >> {
+- int vin
+- int year
+- String make
+- String model
+- String vehicleType
+- String color
+- int odometer
+- double price
+--
++ String toString()
+..
++ {abstract} {method} simple getters
+}
+class VehicleFilters {
++ {static} Predicate<Vehicle> minPrice(double)
++ {static} Predicate<Vehicle> minYear(double)
++ {static} Predicate<Vehicle> make(String)
++ {static} Predicate<Vehicle> model(String)
++ {static} Predicate<Vehicle> minYear(double)
++ {static} Predicate<Vehicle> maxYear(double)
++ {static} Predicate<Vehicle> color(String)
++ {static} Predicate<Vehicle> minOdometer(double)
++ {static} Predicate<Vehicle> maxOdometer(double)
++ {static} Predicate<Vehicle> type(String)
++ {static} Predicate<Vehicle> vin(int)
++ {static} Predicate<Vehicle> all()
+}
+
+Dealership o-- FileBackedDealership
+Vehicle o-- Dealership
+DealershipUI <-u- Program
+Dealership <- DealershipUI
+DealershipUI --> VehicleFilters
+@enduml
