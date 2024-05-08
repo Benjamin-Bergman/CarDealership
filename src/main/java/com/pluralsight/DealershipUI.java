@@ -67,7 +67,7 @@ public final class DealershipUI implements Closeable {
                 case "99" -> {
                     break loop;
                 }
-                default -> System.out.println("Unknown option $input! Please try again.");
+                default -> System.out.println("Unknown option \"$input\"! Please try again.");
             }
         }
 
