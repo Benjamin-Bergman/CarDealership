@@ -18,7 +18,7 @@ public final class DealershipUI implements Closeable {
     @SuppressWarnings("StaticCollection")
     private static final List<String> DISPLAY_OPTIONS = List.of("1", "2", "3", "4", "5", "6", "7");
     private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$?(?!0*\\.00?$)(\\d*(?:\\.\\d\\d?)?)$");
-    private static final Pattern INT_PATTERN = Pattern.compile("^\\d+$");
+    private static final Predicate<String> INT_PATTERN = Pattern.compile("^\\d+$").asPredicate();
     private final Dealership dealership;
     private final Scanner scanner;
 
@@ -59,11 +59,8 @@ public final class DealershipUI implements Closeable {
             }
 
             switch (input) {
-                case "8" -> {
-                    addVehicle();
-                }
-                case "9" -> {
-                }
+                case "8" -> addVehicle();
+                case "9" -> removeVehicle();
                 case "99" -> {
                     break loop;
                 }
@@ -77,6 +74,10 @@ public final class DealershipUI implements Closeable {
     @Override
     public void close() {
         scanner.close();
+    }
+
+    private void removeVehicle() {
+
     }
 
     private void addVehicle() {
@@ -133,15 +134,13 @@ public final class DealershipUI implements Closeable {
         };
     }
 
-    @SuppressWarnings("ObjectAllocationInLoop")
     private int queryIntValue(String which, Integer defaultValue) {
         while (true) {
             System.out.print("Enter the $which: ");
             var input = scanner.nextLine().trim();
             if (defaultValue != null && input.isEmpty())
                 return defaultValue;
-            var match = INT_PATTERN.matcher(input);
-            if (match.matches()) try {
+            if (INT_PATTERN.test(input)) try {
                 return Integer.parseInt(input);
             } catch (NumberFormatException ignored) {
                 // Reachable for an input like 9999999999999999999
@@ -160,13 +159,13 @@ public final class DealershipUI implements Closeable {
         }
     }
 
-    @SuppressWarnings("ObjectAllocationInLoop")
     private double queryMoneyValue(String which, Double defaultValue) {
         while (true) {
             System.out.print("Enter the $which price: ");
             var input = scanner.nextLine().trim();
             if (defaultValue != null && input.isEmpty())
                 return defaultValue;
+            //noinspection ObjectAllocationInLoop
             var match = MONEY_PATTERN.matcher(input);
             if (match.matches()) try {
                 return Double.parseDouble(match.group(1));
