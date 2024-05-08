@@ -46,7 +46,7 @@ public class FileBackedDealership extends Dealership {
                 name = wrapped.getName();
                 address = wrapped.getAddress();
                 phone = wrapped.getPhone();
-            } else throw new IOException("Bad file header when reading " + filePath);
+            } else throw new IOException("Bad file header when reading $filePath");
 
             wrapped.addAll(
                 br.lines()
