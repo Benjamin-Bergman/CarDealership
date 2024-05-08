@@ -100,6 +100,14 @@ public final class VehicleFilters {
     }
 
     /**
+     * @param vin The exact VIN of a vehicle
+     * @return A Predicate applying the condition
+     */
+    public static Predicate<Vehicle> vin(int vin) {
+        return v -> v.vin() == vin;
+    }
+
+    /**
      * Allows every vehicle.
      *
      * @return A Predicate applying the condition

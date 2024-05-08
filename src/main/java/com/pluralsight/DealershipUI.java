@@ -76,8 +76,74 @@ public final class DealershipUI implements Closeable {
         scanner.close();
     }
 
+    @SuppressWarnings({"ReassignedVariable", "MethodWithMoreThanThreeNegations",
+        "MethodWithMultipleLoops", "OverlyComplexMethod", "OverlyLongMethod"})
     private void removeVehicle() {
+        var price = queryMoneyValue("vehicle's", -1.0);
+        var make = queryStringValue("make", true);
+        var model = queryStringValue("model", true);
+        var year = queryIntValue("year", -1);
+        var color = queryStringValue("color", true);
+        var odometer = queryIntValue("odometer reading", -1);
+        var type = queryStringValue("type", true);
+        var vin = queryIntValue("VIN", -1);
 
+        var filter =
+            VehicleFilters.make(make)
+            & VehicleFilters.model(model)
+            & VehicleFilters.color(color)
+            & VehicleFilters.type(type);
+        //noinspection FloatingPointEquality
+        if (price != -1.0)
+            filter &= VehicleFilters.maxPrice(price) & VehicleFilters.minPrice(price);
+        if (year != -1)
+            filter &= VehicleFilters.maxYear(year) & VehicleFilters.minYear(year);
+        if (odometer != -1)
+            filter &= VehicleFilters.maxOdometer(odometer) & VehicleFilters.minOdometer(odometer);
+        if (vin != -1)
+            filter &= VehicleFilters.vin(vin);
+
+        var found = dealership
+            .getAllVehicles()
+            .stream()
+            .filter(filter)
+            .toList();
+
+        if (found.isEmpty()) {
+            System.out.println("Found no matching vehicles. Aborting...");
+            readKey();
+            return;
+        }
+
+        //noinspection HardcodedFileSeparator
+        System.out.print(
+            found.size() == 1 ?
+                """
+                    Found one matching vehicle:
+                    ${found[0]}
+                    Remove it? [y/n]"""
+                : "Found ${found.size()} matching vehicles. Remove all of them? [y/n]"
+        );
+
+        boolean shouldDelete;
+        while (true) {
+            var input = scanner.nextLine().trim().toLowerCase();
+            if ("y".equals(input) || "n".equals(input)
+                || "yes".equals(input) || "no".equals(input)) {
+                shouldDelete = "y".equals(input) || "yes".equals(input);
+                break;
+            }
+            //noinspection HardcodedFileSeparator
+            System.out.print("Unknown option \"$input\". Try again: [y/n] ");
+        }
+        if (shouldDelete) {
+            for (var v : found)
+                dealership.remove(v);
+            System.out.println("Removed ${found.size()} vehicles.");
+        } else
+            System.out.println("Nothing removed.");
+
+        readKey();
     }
 
     private void addVehicle() {
