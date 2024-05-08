@@ -16,7 +16,7 @@ import java.util.stream.*;
 @SuppressWarnings("FeatureEnvy")
 public final class DealershipUI implements Closeable {
     @SuppressWarnings("StaticCollection")
-    private static final List<String> DISPLAY_OPTIONS = List.of("1", "2", "3", "4", "5", "6", "7");
+    private static final List<String> DISPLAY_OPTIONS = List.of("0", "1", "2", "3", "4", "5", "6", "7");
     private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$?(?!0*\\.00?$)(\\d*(?:\\.\\d\\d?)?)$");
     private static final Predicate<String> INT_PATTERN = Pattern.compile("^\\d+$").asPredicate();
     private final Dealership dealership;
@@ -41,6 +41,7 @@ public final class DealershipUI implements Closeable {
         while (true) {
             System.out.print("""
                 --SEARCH--
+                0 - By everything
                 1 - By price
                 2 - By make/model
                 3 - By year
@@ -80,28 +81,7 @@ public final class DealershipUI implements Closeable {
 
     @SuppressWarnings({"MethodWithMultipleLoops", "OverlyComplexMethod"})
     private void removeVehicle() {
-        var price = queryMoneyValue("vehicle's", -1.0);
-        var make = queryStringValue("make", true);
-        var model = queryStringValue("model", true);
-        var year = queryIntValue("year", -1);
-        var color = queryStringValue("color", true);
-        var odometer = queryIntValue("odometer reading", -1);
-        var type = queryStringValue("type", true);
-        var vin = queryIntValue("VIN", -1);
-
-        //noinspection FloatingPointEquality
-        var filter = Stream.of(
-                price == -1 ? null : VehicleFilters.minPrice(price) & VehicleFilters.maxPrice(price),
-                make.isEmpty() ? null : VehicleFilters.make(make),
-                model.isEmpty() ? null : VehicleFilters.model(model),
-                year == -1 ? null : VehicleFilters.minYear(year) & VehicleFilters.maxYear(year),
-                color.isEmpty() ? null : VehicleFilters.color(color),
-                odometer == -1 ? null : VehicleFilters.minOdometer(odometer) & VehicleFilters.maxOdometer(odometer),
-                type.isEmpty() ? null : VehicleFilters.type(type),
-                vin == -1 ? null : VehicleFilters.vin(vin)
-            )
-            .filter(Objects::nonNull)
-            .reduce(VehicleFilters.all(), Predicate::and);
+        var filter = queryArbitraryFilter();
 
         var found = dealership
             .getAllVehicles()
@@ -147,6 +127,31 @@ public final class DealershipUI implements Closeable {
         readKey();
     }
 
+    private Predicate<Vehicle> queryArbitraryFilter() {
+        var price = queryMoneyValue("vehicle's", -1.0);
+        var make = queryStringValue("make", true);
+        var model = queryStringValue("model", true);
+        var year = queryIntValue("year", -1);
+        var color = queryStringValue("color", true);
+        var odometer = queryIntValue("odometer reading", -1);
+        var type = queryStringValue("type", true);
+        var vin = queryIntValue("VIN", -1);
+
+        //noinspection FloatingPointEquality
+        return Stream.of(
+                price == -1 ? null : VehicleFilters.minPrice(price) & VehicleFilters.maxPrice(price),
+                make.isEmpty() ? null : VehicleFilters.make(make),
+                model.isEmpty() ? null : VehicleFilters.model(model),
+                year == -1 ? null : VehicleFilters.minYear(year) & VehicleFilters.maxYear(year),
+                color.isEmpty() ? null : VehicleFilters.color(color),
+                odometer == -1 ? null : VehicleFilters.minOdometer(odometer) & VehicleFilters.maxOdometer(odometer),
+                type.isEmpty() ? null : VehicleFilters.type(type),
+                vin == -1 ? null : VehicleFilters.vin(vin)
+            )
+            .filter(Objects::nonNull)
+            .reduce(VehicleFilters.all(), Predicate::and);
+    }
+
     private void addVehicle() {
         var price = queryMoneyValue("vehicle's", null);
         var make = queryStringValue("make", false);
@@ -173,6 +178,7 @@ public final class DealershipUI implements Closeable {
 
     private Predicate<Vehicle> queryFilterParams(String input) {
         return switch (input) {
+            case "0" -> queryArbitraryFilter();
             case "1" -> {
                 var min = queryMoneyValue("minimum", Double.NEGATIVE_INFINITY);
                 var max = queryMoneyValue("maximum", Double.POSITIVE_INFINITY);
