@@ -14,7 +14,6 @@ import java.util.regex.*;
  */
 @SuppressWarnings("FeatureEnvy")
 public final class DealershipUI implements Closeable {
-    private static final File FILE_PATH = new File("inventory.csv");
     @SuppressWarnings("StaticCollection")
     private static final List<String> DISPLAY_OPTIONS = List.of("1", "2", "3", "4", "5", "6", "7");
     private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$?(?!0*\\.00?$)(\\d*(?:\\.\\d\\d?)?)$");
@@ -24,9 +23,11 @@ public final class DealershipUI implements Closeable {
 
     /**
      * Creates a new instance of the UI.
+     *
+     * @param dealership The dealership this UI controls
      */
-    public DealershipUI() {
-        dealership = new FileBackedDealership(new Dealership("Default_Name", "Default_Address", "Default_Phone"), FILE_PATH);
+    public DealershipUI(Dealership dealership) {
+        this.dealership = dealership;
         scanner = new Scanner(System.in);
     }
 
