@@ -4,8 +4,6 @@
 
 package com.pluralsight;
 
-import com.pluralsight.Dealership.*;
-
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
