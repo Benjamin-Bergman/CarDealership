@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.regex.*;
+import java.util.stream.*;
 
 /**
  * Represents a user interface for interacting with a {@link Dealership}.
@@ -77,8 +78,7 @@ public final class DealershipUI implements Closeable {
         scanner.close();
     }
 
-    @SuppressWarnings({"ReassignedVariable", "MethodWithMoreThanThreeNegations",
-        "MethodWithMultipleLoops", "OverlyComplexMethod", "OverlyLongMethod"})
+    @SuppressWarnings({"MethodWithMultipleLoops", "OverlyComplexMethod"})
     private void removeVehicle() {
         var price = queryMoneyValue("vehicle's", -1.0);
         var make = queryStringValue("make", true);
@@ -89,20 +89,19 @@ public final class DealershipUI implements Closeable {
         var type = queryStringValue("type", true);
         var vin = queryIntValue("VIN", -1);
 
-        var filter =
-            VehicleFilters.make(make)
-            & VehicleFilters.model(model)
-            & VehicleFilters.color(color)
-            & VehicleFilters.type(type);
         //noinspection FloatingPointEquality
-        if (price != -1.0)
-            filter &= VehicleFilters.maxPrice(price) & VehicleFilters.minPrice(price);
-        if (year != -1)
-            filter &= VehicleFilters.maxYear(year) & VehicleFilters.minYear(year);
-        if (odometer != -1)
-            filter &= VehicleFilters.maxOdometer(odometer) & VehicleFilters.minOdometer(odometer);
-        if (vin != -1)
-            filter &= VehicleFilters.vin(vin);
+        var filter = Stream.of(
+                price == -1 ? null : VehicleFilters.minPrice(price) & VehicleFilters.maxPrice(price),
+                make.isEmpty() ? null : VehicleFilters.make(make),
+                model.isEmpty() ? null : VehicleFilters.model(model),
+                year == -1 ? null : VehicleFilters.minYear(year) & VehicleFilters.maxYear(year),
+                color.isEmpty() ? null : VehicleFilters.color(color),
+                odometer == -1 ? null : VehicleFilters.minOdometer(odometer) & VehicleFilters.maxOdometer(odometer),
+                type.isEmpty() ? null : VehicleFilters.type(type),
+                vin == -1 ? null : VehicleFilters.vin(vin)
+            )
+            .filter(Objects::nonNull)
+            .reduce(VehicleFilters.all(), Predicate::and);
 
         var found = dealership
             .getAllVehicles()
@@ -122,8 +121,8 @@ public final class DealershipUI implements Closeable {
                 """
                     Found one matching vehicle:
                     ${found[0]}
-                    Remove it? [y/n]"""
-                : "Found ${found.size()} matching vehicles. Remove all of them? [y/n]"
+                    Remove it? [y/n]\s"""
+                : "Found ${found.size()} matching vehicles. Remove all of them? [y/n] "
         );
 
         boolean shouldDelete;
