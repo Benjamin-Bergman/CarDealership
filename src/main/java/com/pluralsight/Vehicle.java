@@ -20,4 +20,9 @@ public record Vehicle(int vin, int year,
                       String make, String model,
                       String vehicleType, String color,
                       int odometer, double price) {
+    @Override
+    public String toString() {
+        return "$%.2f - %d - %s %d %s %s (%s), %dmi"
+            .formatted(price, vin, color, year, make, model, vehicleType, odometer);
+    }
 }

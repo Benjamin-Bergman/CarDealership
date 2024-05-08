@@ -182,5 +182,14 @@ public class Dealership {
             var cleaned = type.trim().toLowerCase();
             return v -> v.vehicleType().toLowerCase().contains(cleaned);
         }
+
+        /**
+         * Allows every vehicle.
+         *
+         * @return A Predicate applying the condition
+         */
+        public static Predicate<Vehicle> all() {
+            return v -> true;
+        }
     }
 }
