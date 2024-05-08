@@ -60,6 +60,7 @@ public final class DealershipUI implements Closeable {
 
             switch (input) {
                 case "8" -> {
+                    addVehicle();
                 }
                 case "9" -> {
                 }
@@ -78,6 +79,25 @@ public final class DealershipUI implements Closeable {
         scanner.close();
     }
 
+    private void addVehicle() {
+        var price = queryMoneyValue("vehicle's", null);
+        var make = queryStringValue("make", false);
+        var model = queryStringValue("model", false);
+        var year = queryIntValue("year", null);
+        var color = queryStringValue("color", false);
+        var odometer = queryIntValue("odometer reading", null);
+        var type = queryStringValue("type", false);
+        var vin = queryIntValue("VIN", null);
+
+        var v = new Vehicle(vin, year, make, model, type, color, odometer, price);
+        dealership.add(v);
+        System.out.print("""
+            Successfully added the vehicle:
+            $v
+            """);
+        readKey();
+    }
+
     private void readKey() {
         System.out.println("Press enter to continue...");
         scanner.nextLine();
@@ -86,27 +106,27 @@ public final class DealershipUI implements Closeable {
     private Predicate<Vehicle> queryFilterParams(String input) {
         return switch (input) {
             case "1" -> {
-                var min = queryMoneyValue("minimum").orElse(Double.NEGATIVE_INFINITY);
-                var max = queryMoneyValue("maximum").orElse(Double.POSITIVE_INFINITY);
+                var min = queryMoneyValue("minimum", Double.NEGATIVE_INFINITY);
+                var max = queryMoneyValue("maximum", Double.POSITIVE_INFINITY);
                 yield VehicleFilters.minPrice(min) & VehicleFilters.maxPrice(max);
             }
             case "2" -> {
-                var make = queryStringValue("make");
-                var model = queryStringValue("model");
+                var make = queryStringValue("make", true);
+                var model = queryStringValue("model", true);
                 yield VehicleFilters.make(make) & VehicleFilters.model(model);
             }
             case "3" -> {
-                var min = queryIntValue("minimum year").orElse(Integer.MIN_VALUE);
-                var max = queryIntValue("maximum year").orElse(Integer.MAX_VALUE);
+                var min = queryIntValue("minimum year", Integer.MIN_VALUE);
+                var max = queryIntValue("maximum year", Integer.MAX_VALUE);
                 yield VehicleFilters.minYear(min) & VehicleFilters.maxYear(max);
             }
-            case "4" -> VehicleFilters.color(queryStringValue("color"));
+            case "4" -> VehicleFilters.color(queryStringValue("color", true));
             case "5" -> {
-                var min = queryIntValue("minimum reading").orElse(Integer.MIN_VALUE);
-                var max = queryIntValue("maximum reading").orElse(Integer.MAX_VALUE);
+                var min = queryIntValue("minimum reading", Integer.MIN_VALUE);
+                var max = queryIntValue("maximum reading", Integer.MAX_VALUE);
                 yield VehicleFilters.minOdometer(min) & VehicleFilters.maxOdometer(max);
             }
-            case "6" -> VehicleFilters.type(queryStringValue("type"));
+            case "6" -> VehicleFilters.type(queryStringValue("type", true));
             case "7" -> VehicleFilters.all();
             default -> //noinspection ProhibitedExceptionThrown
                 throw new RuntimeException("Unreachable");
@@ -114,15 +134,15 @@ public final class DealershipUI implements Closeable {
     }
 
     @SuppressWarnings("ObjectAllocationInLoop")
-    private OptionalInt queryIntValue(String which) {
+    private int queryIntValue(String which, Integer defaultValue) {
         while (true) {
             System.out.print("Enter the $which: ");
             var input = scanner.nextLine().trim();
-            if (input.isEmpty())
-                return OptionalInt.empty();
+            if (defaultValue != null && input.isEmpty())
+                return defaultValue;
             var match = INT_PATTERN.matcher(input);
             if (match.matches()) try {
-                return OptionalInt.of(Integer.parseInt(input));
+                return Integer.parseInt(input);
             } catch (NumberFormatException ignored) {
                 // Reachable for an input like 9999999999999999999
             }
@@ -130,21 +150,26 @@ public final class DealershipUI implements Closeable {
         }
     }
 
-    private String queryStringValue(String which) {
-        System.out.print("Enter the $which: ");
-        return scanner.nextLine().trim();
+    private String queryStringValue(String which, boolean allowEmpty) {
+        while (true) {
+            System.out.print("Enter the $which: ");
+            var input = scanner.nextLine().trim();
+            if (allowEmpty || !input.isEmpty())
+                return input;
+            System.out.println("Bad input, please try again.");
+        }
     }
 
     @SuppressWarnings("ObjectAllocationInLoop")
-    private OptionalDouble queryMoneyValue(String which) {
+    private double queryMoneyValue(String which, Double defaultValue) {
         while (true) {
             System.out.print("Enter the $which price: ");
             var input = scanner.nextLine().trim();
-            if (input.isEmpty())
-                return OptionalDouble.empty();
+            if (defaultValue != null && input.isEmpty())
+                return defaultValue;
             var match = MONEY_PATTERN.matcher(input);
             if (match.matches()) try {
-                return OptionalDouble.of(Double.parseDouble(match.group(1)));
+                return Double.parseDouble(match.group(1));
             } catch (NumberFormatException ignored) {
             }
             System.out.println("Bad input, please try again.");
