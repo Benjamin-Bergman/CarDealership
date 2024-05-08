@@ -28,15 +28,19 @@ public final class FileBackedDealership implements Dealership {
         this.filePath = filePath;
 
         wrapped.clear();
+        boolean shouldRewrite;
+
         try (var fr = new FileReader(filePath);
              var br = new BufferedReader(fr)) {
             var header = br.readLine();
 
-            var parts = header.split("\\|");
-            if (parts.length == 3) {
+            String[] parts;
+            //noinspection NestedAssignment
+            if (header != null && (parts = header.split("\\|")).length == 3) {
                 displayName = parts[0];
                 address = parts[1];
                 phone = parts[2];
+                shouldRewrite = false;
             } else if (
                 isValid(wrapped.getDisplayName())
                 && isValid(wrapped.getAddress())
@@ -45,7 +49,9 @@ public final class FileBackedDealership implements Dealership {
                 displayName = wrapped.getDisplayName();
                 address = wrapped.getAddress();
                 phone = wrapped.getPhone();
+                shouldRewrite = true;
             } else throw new IOException("Bad file header when reading $filePath");
+
 
             wrapped.addAll(
                 br.lines()
@@ -54,6 +60,9 @@ public final class FileBackedDealership implements Dealership {
                     .collect(Collectors.toList())
             );
         }
+
+        if (shouldRewrite)
+            writeAll();
     }
 
     private static boolean isValid(String str) {
