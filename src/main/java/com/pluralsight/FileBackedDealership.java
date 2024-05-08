@@ -11,7 +11,7 @@ import java.util.stream.*;
 /**
  * Decorates a {@link Dealership} with file-saving semantics.
  */
-public class FileBackedDealership extends Dealership {
+public final class FileBackedDealership implements Dealership {
     private final File filePath;
     private final Dealership wrapped;
     private final String name, address, phone;
@@ -24,7 +24,6 @@ public class FileBackedDealership extends Dealership {
      * @param filePath The File to load from and save to
      */
     public FileBackedDealership(Dealership wrapped, File filePath) {
-        super(null, null, null);
         this.wrapped = wrapped;
         this.filePath = filePath;
 

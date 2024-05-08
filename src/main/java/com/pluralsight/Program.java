@@ -11,7 +11,7 @@ final class Program {
     private static final File FILE_PATH = new File("inventory.csv");
 
     public static void main(String[] args) {
-        var dealership = new FileBackedDealership(new Dealership("Default_Name", "Default_Address", "Default_Phone"), FILE_PATH);
+        var dealership = new FileBackedDealership(new BasicDealership("Default_Name", "Default_Address", "Default_Phone"), FILE_PATH);
 
         try (var ui = new DealershipUI(dealership)) {
             ui.display();
