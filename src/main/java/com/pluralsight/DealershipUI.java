@@ -7,6 +7,7 @@ package com.pluralsight;
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
+import java.util.regex.*;
 
 /**
  * Represents a user interface for interacting with a {@link Dealership}.
@@ -16,6 +17,8 @@ public final class DealershipUI implements Closeable {
     private static final File FILE_PATH = new File("inventory.csv");
     @SuppressWarnings("StaticCollection")
     private static final List<String> DISPLAY_OPTIONS = List.of("1", "2", "3", "4", "5", "6", "7");
+    private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$?(?!0*\\.00?$)(\\d*(?:\\.\\d\\d?)?)$");
+    private static final Pattern INT_PATTERN = Pattern.compile("^\\d+$");
     private final Dealership dealership;
     private final Scanner scanner;
 
@@ -51,6 +54,7 @@ public final class DealershipUI implements Closeable {
             var input = scanner.nextLine().trim();
             if (DISPLAY_OPTIONS.contains(input)) {
                 displayVehicles(queryFilterParams(input));
+                readKey();
                 continue;
             }
 
@@ -74,32 +78,73 @@ public final class DealershipUI implements Closeable {
         scanner.close();
     }
 
+    private void readKey() {
+        System.out.println("Press enter to continue...");
+        scanner.nextLine();
+    }
+
     private Predicate<Vehicle> queryFilterParams(String input) {
         return switch (input) {
             case "1" -> {
-                yield VehicleFilters.minPrice(0) & VehicleFilters.maxPrice(Double.POSITIVE_INFINITY);
+                var min = queryMoneyValue("minimum");
+                var max = queryMoneyValue("maximum");
+                yield VehicleFilters.minPrice(min) & VehicleFilters.maxPrice(max);
             }
             case "2" -> {
-                yield VehicleFilters.make("") & VehicleFilters.model("");
+                var make = queryStringValue("make");
+                var model = queryStringValue("model");
+                yield VehicleFilters.make(make) & VehicleFilters.model(model);
             }
             case "3" -> {
-                yield VehicleFilters.minYear(0) & VehicleFilters.maxYear(Integer.MAX_VALUE);
+                var min = queryIntValue("minimum year");
+                var max = queryIntValue("maximum year");
+                yield VehicleFilters.minYear(min) & VehicleFilters.maxYear(max);
             }
-            case "4" -> {
-                yield VehicleFilters.color("");
-            }
+            case "4" -> VehicleFilters.color(queryStringValue("color"));
             case "5" -> {
-                yield VehicleFilters.minOdometer(0) & VehicleFilters.maxOdometer(Integer.MAX_VALUE);
+                var min = queryIntValue("minimum reading");
+                var max = queryIntValue("maximum reading");
+                yield VehicleFilters.minOdometer(min) & VehicleFilters.maxOdometer(max);
             }
-            case "6" -> {
-                yield VehicleFilters.type("");
-            }
+            case "6" -> VehicleFilters.type(queryStringValue("type"));
             case "7" -> VehicleFilters.all();
-            default -> {
-                //noinspection ProhibitedExceptionThrown
+            default -> //noinspection ProhibitedExceptionThrown
                 throw new RuntimeException("Unreachable");
-            }
         };
+    }
+
+    @SuppressWarnings("ObjectAllocationInLoop")
+    private int queryIntValue(String which) {
+        while (true) {
+            System.out.print("Enter the $which: ");
+            var input = scanner.nextLine().trim();
+            var match = INT_PATTERN.matcher(input);
+            if (match.matches()) try {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException ignored) {
+                // Reachable for an input like 9999999999999999999
+            }
+            System.out.println("Bad input, please try again.");
+        }
+    }
+
+    private String queryStringValue(String which) {
+        System.out.print("Enter the $which: ");
+        return scanner.nextLine().trim();
+    }
+
+    @SuppressWarnings("ObjectAllocationInLoop")
+    private double queryMoneyValue(String which) {
+        while (true) {
+            System.out.print("Enter the $which price: ");
+            var input = scanner.nextLine().trim();
+            var match = MONEY_PATTERN.matcher(input);
+            if (match.matches()) try {
+                return Double.parseDouble(match.group(1));
+            } catch (NumberFormatException ignored) {
+            }
+            System.out.println("Bad input, please try again.");
+        }
     }
 
     private void displayVehicles(Predicate<? super Vehicle> filter) {
