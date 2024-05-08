@@ -23,7 +23,7 @@ public interface Dealership {
     /**
      * @return This dealership's name
      */
-    String getName();
+    String getDisplayName();
 
     /**
      * @return Every vehicle in this dealership

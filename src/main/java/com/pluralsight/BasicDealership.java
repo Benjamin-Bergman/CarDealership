@@ -10,18 +10,18 @@ import java.util.*;
  * A basic implementation of a {@link Dealership}.
  */
 public final class BasicDealership implements Dealership {
-    private final String name;
+    private final String displayName;
     private final String address;
     private final String phone;
     private final List<Vehicle> inventory = new ArrayList<>();
 
     /**
-     * @param name    This dealership's name
-     * @param address This dealership's address
-     * @param phone   This dealership's phone number
+     * @param displayName This dealership's name
+     * @param address     This dealership's address
+     * @param phone       This dealership's phone number
      */
-    public BasicDealership(String name, String address, String phone) {
-        this.name = name;
+    public BasicDealership(String displayName, String address, String phone) {
+        this.displayName = displayName;
         this.address = address;
         this.phone = phone;
     }
@@ -37,8 +37,8 @@ public final class BasicDealership implements Dealership {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override

@@ -14,7 +14,7 @@ import java.util.stream.*;
 public final class FileBackedDealership implements Dealership {
     private final File filePath;
     private final Dealership wrapped;
-    private final String name, address, phone;
+    private final String displayName, address, phone;
 
     /**
      * Creates a new FileBackedDealership.
@@ -34,15 +34,15 @@ public final class FileBackedDealership implements Dealership {
 
             var parts = header.split("\\|");
             if (parts.length == 3) {
-                name = parts[0];
+                displayName = parts[0];
                 address = parts[1];
                 phone = parts[2];
             } else if (
-                isValid(wrapped.getName())
+                isValid(wrapped.getDisplayName())
                 && isValid(wrapped.getAddress())
                 && isValid(wrapped.getPhone())
             ) {
-                name = wrapped.getName();
+                displayName = wrapped.getDisplayName();
                 address = wrapped.getAddress();
                 phone = wrapped.getPhone();
             } else throw new IOException("Bad file header when reading $filePath");
@@ -121,8 +121,8 @@ public final class FileBackedDealership implements Dealership {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override
@@ -168,7 +168,7 @@ public final class FileBackedDealership implements Dealership {
     private void writeAll() {
         try (var fw = new FileWriter(filePath);
              var bw = new BufferedWriter(fw)) {
-            bw.write(name);
+            bw.write(displayName);
             bw.write('|');
             bw.write(address);
             bw.write('|');

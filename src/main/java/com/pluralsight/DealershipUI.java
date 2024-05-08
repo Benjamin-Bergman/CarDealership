@@ -35,7 +35,7 @@ public final class DealershipUI implements Closeable {
      * Runs the UI.
      */
     public void display() {
-        System.out.println("Welcome to " + dealership.getName() + '!');
+        System.out.println("Welcome to " + dealership.getDisplayName() + '!');
         loop:
         while (true) {
             System.out.print("""
