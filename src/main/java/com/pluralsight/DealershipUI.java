@@ -137,6 +137,7 @@ public final class DealershipUI implements Closeable {
             //noinspection HardcodedFileSeparator
             System.out.print("Unknown option \"$input\". Try again: [y/n] ");
         }
+
         if (shouldDelete) {
             for (var v : found)
                 dealership.remove(v);
