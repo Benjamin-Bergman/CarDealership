@@ -24,7 +24,7 @@ together {
     - String address
     - String phone
     - List<Vehicle> inventory
-    --
+    __
     + BasicDealership(String, String, String)
     ..
     + {abstract} {method} overrides
@@ -35,7 +35,7 @@ together {
     - String displayName
     - String address
     - String phone
-    --
+    __
     + FileBackedDealership(Dealership, File)
     ..
     + {abstract} {method} overrides
@@ -50,7 +50,7 @@ class Vehicle << (R,orange) >> {
 - String color
 - int odometer
 - double price
---
+__
 + String toString()
 ..
 + {abstract} {method} simple getters
@@ -70,9 +70,9 @@ class VehicleFilters {
 + {static} Predicate<Vehicle> all()
 }
 
-Dealership o-- FileBackedDealership
+Dealership *-- FileBackedDealership
 Vehicle o-- Dealership
 DealershipUI <-u- Program
 Dealership <- DealershipUI
-DealershipUI --> VehicleFilters
+VehicleFilters <-u- DealershipUI
 @enduml
