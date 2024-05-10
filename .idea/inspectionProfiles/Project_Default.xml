@@ -183,7 +183,9 @@
     <inspection_tool class="DynamicRegexReplaceableByCompiledPattern" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="EmptyClass" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignorableAnnotations">
-        <value />
+        <value>
+          <item value="org.junit.jupiter.api.Nested" />
+        </value>
       </option>
       <option name="ignoreClassWithParameterization" value="false" />
       <option name="ignoreThrowables" value="true" />
