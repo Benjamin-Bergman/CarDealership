@@ -6,31 +6,36 @@ package com.pluralsight;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.*;
 
 /**
  * Decorates a {@link Dealership} with file-saving semantics.
  */
-public final class FileBackedDealership implements Dealership {
-    private final File filePath;
+public final class ResourceBackedDealership implements Dealership {
+    private final Function<Boolean, Writer> writer;
     private final Dealership wrapped;
     private final String displayName, address, phone;
 
     /**
-     * Creates a new FileBackedDealership.
-     * Note that this replaces the contents of {@code wrapped} with the contents of the file.
+     * Creates a new ResourceBackedDealership.
+     * Note that this replaces the contents of {@code wrapped} with the contents of the resource.
      *
-     * @param wrapped  The Dealership to decorate
-     * @param filePath The File to load from and save to
+     * @param wrapped The Dealership to decorate
+     * @param reader  A supplier to create a readable stream of the resource.
+     * @param writer  A supplier to create a writable stream of the resource.
+     *                It accepts one boolean argument: if {@code true},
+     *                the writer should implement appending semantics,
+     *                otherwise it should implement overwriting semantics.
      */
-    public FileBackedDealership(Dealership wrapped, File filePath) {
+    public ResourceBackedDealership(Dealership wrapped, Supplier<Reader> reader, Function<Boolean, Writer> writer) {
         this.wrapped = wrapped;
-        this.filePath = filePath;
+        this.writer = writer;
 
         wrapped.clear();
         boolean shouldRewrite;
 
-        try (var fr = new FileReader(filePath);
+        try (var fr = reader.get();
              var br = new BufferedReader(fr)) {
             var header = br.readLine();
 
@@ -50,12 +55,12 @@ public final class FileBackedDealership implements Dealership {
                 address = wrapped.getAddress();
                 phone = wrapped.getPhone();
                 shouldRewrite = true;
-            } else throw new IOException("Bad file header when reading $filePath");
+            } else throw new IOException("Bad file header when reading");
 
 
             wrapped.addAll(
                 br.lines()
-                    .map(FileBackedDealership::parseLine)
+                    .map(ResourceBackedDealership::parseLine)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList())
             );
@@ -142,8 +147,8 @@ public final class FileBackedDealership implements Dealership {
     @Override
     public void add(Vehicle vehicle) {
         wrapped.add(vehicle);
-        try (FileWriter fw = new FileWriter(filePath, true);
-             BufferedWriter bw = new BufferedWriter(fw)) {
+        try (var fw = writer.apply(true);
+             var bw = new BufferedWriter(fw)) {
             bw.newLine();
             bw.write(serialize(vehicle));
         }
@@ -152,8 +157,8 @@ public final class FileBackedDealership implements Dealership {
     @Override
     public void addAll(Collection<Vehicle> vehicles) {
         wrapped.addAll(vehicles);
-        try (FileWriter fw = new FileWriter(filePath, true);
-             BufferedWriter bw = new BufferedWriter(fw)) {
+        try (var fw = writer.apply(true);
+             var bw = new BufferedWriter(fw)) {
             for (var v : vehicles) {
                 bw.newLine();
                 bw.write(serialize(v));
@@ -175,7 +180,7 @@ public final class FileBackedDealership implements Dealership {
     }
 
     private void writeAll() {
-        try (var fw = new FileWriter(filePath);
+        try (var fw = writer.apply(false);
              var bw = new BufferedWriter(fw)) {
             bw.write(displayName);
             bw.write('|');
