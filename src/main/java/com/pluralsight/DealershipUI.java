@@ -21,25 +21,29 @@ public final class DealershipUI implements Closeable {
     private static final Predicate<String> INT_PATTERN = Pattern.compile("^\\d+$").asPredicate();
     private final Dealership dealership;
     private final Scanner scanner;
+    private final PrintStream out;
 
     /**
      * Creates a new instance of the UI.
      *
      * @param dealership The dealership this UI controls
+     * @param out        The output stream to write to
+     * @param in         The input stream to read from
      */
-    public DealershipUI(Dealership dealership) {
+    public DealershipUI(Dealership dealership, PrintStream out, InputStream in) {
         this.dealership = dealership;
-        scanner = new Scanner(System.in);
+        this.out = out;
+        scanner = new Scanner(in);
     }
 
     /**
      * Runs the UI.
      */
     public void display() {
-        System.out.println("Welcome to " + dealership.getDisplayName() + '!');
+        out.println("Welcome to " + dealership.getDisplayName() + '!');
         loop:
         while (true) {
-            System.out.print("""
+            out.print("""
                 --SEARCH--
                 0 - By everything
                 1 - By price
@@ -67,11 +71,11 @@ public final class DealershipUI implements Closeable {
                 case "99" -> {
                     break loop;
                 }
-                default -> System.out.println("Unknown option \"$input\"! Please try again.");
+                default -> out.println("Unknown option \"$input\"! Please try again.");
             }
         }
 
-        System.out.println("Thanks for stopping by!");
+        out.println("Thanks for stopping by!");
     }
 
     @Override
@@ -90,13 +94,13 @@ public final class DealershipUI implements Closeable {
             .toList();
 
         if (found.isEmpty()) {
-            System.out.println("Found no matching vehicles. Aborting...");
+            out.println("Found no matching vehicles. Aborting...");
             readKey();
             return;
         }
 
         //noinspection HardcodedFileSeparator
-        System.out.print(
+        out.print(
             found.size() == 1 ?
                 """
                     Found one matching vehicle:
@@ -114,15 +118,15 @@ public final class DealershipUI implements Closeable {
                 break;
             }
             //noinspection HardcodedFileSeparator
-            System.out.print("Unknown option \"$input\". Try again: [y/n] ");
+            out.print("Unknown option \"$input\". Try again: [y/n] ");
         }
 
         if (shouldDelete) {
             for (var v : found)
                 dealership.remove(v);
-            System.out.println("Removed ${found.size()} vehicles.");
+            out.println("Removed ${found.size()} vehicles.");
         } else
-            System.out.println("Nothing removed.");
+            out.println("Nothing removed.");
 
         readKey();
     }
@@ -164,7 +168,7 @@ public final class DealershipUI implements Closeable {
 
         var v = new Vehicle(vin, year, make, model, type, color, odometer, price);
         dealership.add(v);
-        System.out.print("""
+        out.print("""
             Successfully added the vehicle:
             $v
             """);
@@ -172,7 +176,7 @@ public final class DealershipUI implements Closeable {
     }
 
     private void readKey() {
-        System.out.println("Press enter to continue...");
+        out.println("Press enter to continue...");
         scanner.nextLine();
     }
 
@@ -209,7 +213,7 @@ public final class DealershipUI implements Closeable {
 
     private int queryIntValue(String which, Integer defaultValue) {
         while (true) {
-            System.out.print("Enter the $which: ");
+            out.print("Enter the $which: ");
             var input = scanner.nextLine().trim();
             if (defaultValue != null && input.isEmpty())
                 return defaultValue;
@@ -218,23 +222,23 @@ public final class DealershipUI implements Closeable {
             } catch (NumberFormatException ignored) {
                 // Reachable for an input like 9999999999999999999
             }
-            System.out.println("Bad input, please try again.");
+            out.println("Bad input, please try again.");
         }
     }
 
     private String queryStringValue(String which, boolean allowEmpty) {
         while (true) {
-            System.out.print("Enter the $which: ");
+            out.print("Enter the $which: ");
             var input = scanner.nextLine().trim();
             if (allowEmpty || !input.isEmpty())
                 return input;
-            System.out.println("Bad input, please try again.");
+            out.println("Bad input, please try again.");
         }
     }
 
     private double queryMoneyValue(String which, Double defaultValue) {
         while (true) {
-            System.out.print("Enter the $which price: ");
+            out.print("Enter the $which price: ");
             var input = scanner.nextLine().trim();
             if (defaultValue != null && input.isEmpty())
                 return defaultValue;
@@ -244,7 +248,7 @@ public final class DealershipUI implements Closeable {
                 return Double.parseDouble(match.group(1));
             } catch (NumberFormatException ignored) {
             }
-            System.out.println("Bad input, please try again.");
+            out.println("Bad input, please try again.");
         }
     }
 
@@ -253,6 +257,6 @@ public final class DealershipUI implements Closeable {
             .getAllVehicles()
             .stream()
             .filter(filter)
-            .forEachOrdered(System.out::println);
+            .forEachOrdered(out::println);
     }
 }

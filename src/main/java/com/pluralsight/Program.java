@@ -13,7 +13,7 @@ final class Program {
     public static void main(String[] args) {
         var dealership = new FileBackedDealership(new BasicDealership("Default_Name", "Default_Address", "Default_Phone"), FILE_PATH);
 
-        try (var ui = new DealershipUI(dealership)) {
+        try (var ui = new DealershipUI(dealership, System.out, System.in)) {
             ui.display();
         }
     }
