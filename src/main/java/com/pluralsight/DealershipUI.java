@@ -17,7 +17,7 @@ import java.util.stream.*;
 public final class DealershipUI implements Closeable {
     @SuppressWarnings("StaticCollection")
     private static final List<String> DISPLAY_OPTIONS = List.of("0", "1", "2", "3", "4", "5", "6", "7");
-    private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$(\\d*(?:\\.\\d\\d?)?)$");
+    private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$?(\\d*(?:\\.\\d\\d?)?)$");
     private static final Predicate<String> INT_PATTERN = Pattern.compile("^\\d+$").asPredicate();
     private final Dealership dealership;
     private final Scanner scanner;
