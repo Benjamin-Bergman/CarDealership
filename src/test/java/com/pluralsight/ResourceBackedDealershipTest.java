@@ -400,10 +400,7 @@ class ResourceBackedDealershipTest {
         private static final String FILE_ADDRESS = "FILE_ADDRESS";
         private static final String FILE_PHONE = "FILE_PHONE";
         private static final String FILE_HEADER = "$FILE_DISPLAY_NAME|$FILE_ADDRESS|$FILE_PHONE";
-        private static final String FILE_DATA = """
-            $FILE_HEADER
-            $SERIALIZED_VEHICLE
-            """;
+        private static final String FILE_DATA = "$FILE_HEADER$SERIALIZED_VEHICLE";
 
         @BeforeEach
         void createDealership() {
@@ -627,6 +624,9 @@ class ResourceBackedDealershipTest {
             0|B|C|D|E|F|G|H
             0|0|C|D|E|F|G|H
             0|0|C|D|E|F|0|H
+            0|0|0
+                        \s
+            0|0|0|0|0|0|0|0|0|0
             """;
 
         @Test

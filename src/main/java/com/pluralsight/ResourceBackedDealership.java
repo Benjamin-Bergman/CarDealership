@@ -7,7 +7,6 @@ package com.pluralsight;
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.*;
 
 /**
  * Decorates a {@link Dealership} with file-saving semantics.
@@ -32,8 +31,7 @@ public final class ResourceBackedDealership implements Dealership {
         this.wrapped = wrapped;
         this.writer = writer;
 
-        wrapped.clear();
-        boolean shouldRewrite;
+        boolean emptyFile, anyInvalid;
 
         try (var fr = reader.get();
              var br = new BufferedReader(fr)) {
@@ -45,7 +43,7 @@ public final class ResourceBackedDealership implements Dealership {
                 displayName = parts[0];
                 address = parts[1];
                 phone = parts[2];
-                shouldRewrite = false;
+                emptyFile = false;
             } else if (
                 isValid(wrapped.getDisplayName())
                 && isValid(wrapped.getAddress())
@@ -54,19 +52,26 @@ public final class ResourceBackedDealership implements Dealership {
                 displayName = wrapped.getDisplayName();
                 address = wrapped.getAddress();
                 phone = wrapped.getPhone();
-                shouldRewrite = true;
+                emptyFile = true;
             } else throw new IOException("Bad file header when reading");
 
-
-            wrapped.addAll(
+            var items =
                 br.lines()
                     .map(ResourceBackedDealership::parseLine)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList())
-            );
+                    .toList();
+
+            anyInvalid = items.contains(null);
+
+            if (!emptyFile)
+                wrapped.clear();
+
+            var filteredItems = items.stream().filter(Objects::nonNull).toList();
+
+            if (!filteredItems.isEmpty())
+                wrapped.addAll(filteredItems);
         }
 
-        if (shouldRewrite)
+        if (emptyFile || anyInvalid)
             writeAll();
     }
 
@@ -75,8 +80,7 @@ public final class ResourceBackedDealership implements Dealership {
     }
 
     private static Vehicle parseLine(String s) {
-        if (s == null)
-            return null;
+        assert s != null : "s comes from BufferedReader.lines()";
         var parts = s.split("\\|");
         if (parts.length != 8)
             return null;
