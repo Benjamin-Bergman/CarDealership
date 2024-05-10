@@ -19,7 +19,7 @@ together {
     + {abstract} boolean remove(Vehicle)
     + {abstract} void clear()
     }
-    class BasicDealership implements Dealership {
+    class BasicDealership {
     - String displayName
     - String address
     - String phone
@@ -29,14 +29,14 @@ together {
     ..
     + {abstract} {method} overrides
     }
-    class FileBackedDealership Implements Dealership {
+    class ResourceBackedDealership Implements Dealership {
     - File filePath
     - Dealership wrapped
     - String displayName
     - String address
     - String phone
     __
-    + FileBackedDealership(Dealership, File)
+    + ResourceBackedDealership(Dealership, Supplier<Reader>, Function<Boolean, Writer>)
     ..
     + {abstract} {method} overrides
     }
@@ -70,9 +70,10 @@ class VehicleFilters {
 + {static} Predicate<Vehicle> all()
 }
 
-Dealership *-- FileBackedDealership
+Dealership *-- ResourceBackedDealership
 Vehicle o-- Dealership
 DealershipUI <-u- Program
 Dealership <- DealershipUI
 VehicleFilters <-u- DealershipUI
+Dealership <|.r. BasicDealership
 @enduml

@@ -29,4 +29,4 @@ Follow these steps to get your application running within IntelliJ IDEA:
 
 ## Class Diagram
 
-![image](https://github.com/Benjamin-Bergman/CarDealership/assets/166551442/3aaf03b4-8980-4575-ba20-a6db288518f5)
+![image](https://github.com/Benjamin-Bergman/CarDealership/assets/166551442/9464fc00-6cb7-434c-8fda-4dfce22b0ef5)
