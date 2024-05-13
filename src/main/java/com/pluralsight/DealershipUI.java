@@ -88,7 +88,7 @@ public final class DealershipUI implements Closeable {
 
     @SuppressWarnings({"MethodWithMultipleLoops", "OverlyComplexMethod"})
     private void removeVehicle() {
-        var filter = queryArbitraryFilter();
+        var filter = queryArbitraryFilter() & VehicleFilters.available(contracts);
 
         var found = dealership
             .getAllVehicles()
@@ -211,7 +211,7 @@ public final class DealershipUI implements Closeable {
             case "7" -> VehicleFilters.all();
             default -> //noinspection ProhibitedExceptionThrown
                 throw new RuntimeException("Unreachable");
-        };
+        } & VehicleFilters.available(contracts);
     }
 
     private int queryIntValue(String which, Integer defaultValue) {

@@ -115,4 +115,16 @@ public final class VehicleFilters {
     public static Predicate<Vehicle> all() {
         return v -> true;
     }
+
+    /**
+     * Allows vehicles that have not been sold or leased.
+     *
+     * @param list The contracts to check
+     * @return A Predicate applying the condition
+     */
+    public static Predicate<Vehicle> available(ContractCollection list) {
+        return v ->
+            list.getSales().stream().noneMatch(sale -> sale.getVin() == v.vin())
+            && list.getLeases().stream().noneMatch(lease -> lease.getVin() == v.vin());
+    }
 }

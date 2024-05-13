@@ -31,11 +31,22 @@ definitions:
       - email
       - vin
   Sale:
-    allOf:
-      - $ref: '#/definitions/Lease'
-      - type: object
-        properties:
-          financed:
-            type: boolean
-        required:
-          - 'financed'
+    type: object
+    properties:
+      financed:
+        type: boolean
+      date:
+        type: string
+        format: "date"
+      name:
+        type: string
+      email:
+        type: string
+      vin:
+        type: integer
+    required:
+      - date
+      - name
+      - email
+      - vin
+      - financed
