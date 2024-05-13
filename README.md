@@ -8,9 +8,11 @@ Instructions on how to set up and run the project using IntelliJ IDEA.
 
 ### Prerequisites
 
-- IntelliJ IDEA: Ensure you have IntelliJ IDEA installed, which you can download from [here](https://www.jetbrains.com/idea/download/).
+- IntelliJ IDEA: Ensure you have IntelliJ IDEA installed, which you can download
+  from [here](https://www.jetbrains.com/idea/download/).
 - Java SDK: Make sure Java SDK is installed and configured in IntelliJ.
-- IntelliJ Manifold plugin: The program will compile and run without this, but it provides a better editor experience. You can download it [here](https://plugins.jetbrains.com/plugin/10057-manifold).
+- IntelliJ Manifold plugin: The program will compile and run without this, but it provides a better editor experience.
+  You can download it [here](https://plugins.jetbrains.com/plugin/10057-manifold).
 
 ### Running the Application in IntelliJ
 
