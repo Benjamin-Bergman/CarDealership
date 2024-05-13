@@ -4,7 +4,7 @@
 
 package com.pluralsight;
 
-import com.pluralsight.ContractList.*;
+import com.pluralsight.ContractListSchema.*;
 
 import java.util.*;
 

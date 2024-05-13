@@ -4,7 +4,7 @@
 
 package com.pluralsight;
 
-import com.pluralsight.ContractList.*;
+import com.pluralsight.ContractListSchema.*;
 
 import java.io.*;
 import java.util.*;
@@ -14,14 +14,14 @@ import java.util.*;
  */
 public class FileBackedContractList implements ContractCollection {
     private final File path;
-    private final ContractList list;
+    private final ContractListSchema list;
 
     /**
      * @param path The yaml file containing the data.
      */
     public FileBackedContractList(File path) {
         this.path = path;
-        list = ContractList.load().fromYamlFile(path);
+        list = ContractListSchema.load().fromYamlFile(path);
     }
 
     @Override
