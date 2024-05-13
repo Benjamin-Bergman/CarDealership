@@ -9,6 +9,7 @@ import java.io.*;
 @SuppressWarnings("UtilityClass")
 final class Program {
     private static final File FILE_PATH = new File("inventory.csv");
+    private static final File CONTRACTS_PATH = new File("contracts.yaml");
 
     public static void main(String[] args) {
         var dealership = new ResourceBackedDealership(
@@ -16,7 +17,9 @@ final class Program {
             () -> new FileReader(FILE_PATH),
             append -> new FileWriter(FILE_PATH, append));
 
-        try (var ui = new DealershipUI(dealership, System.out, System.in)) {
+        var contracts = new FileBackedContractList(CONTRACTS_PATH);
+
+        try (var ui = new DealershipUI(dealership, contracts, System.out, System.in)) {
             ui.display();
         }
     }

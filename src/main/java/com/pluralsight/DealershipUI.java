@@ -22,16 +22,19 @@ public final class DealershipUI implements Closeable {
     private final Dealership dealership;
     private final Scanner scanner;
     private final PrintStream out;
+    private final ContractCollection contracts;
 
     /**
      * Creates a new instance of the UI.
      *
      * @param dealership The dealership this UI controls
+     * @param contracts  The collection of contracts to use.
      * @param out        The output stream to write to
      * @param in         The input stream to read from
      */
-    public DealershipUI(Dealership dealership, PrintStream out, InputStream in) {
+    public DealershipUI(Dealership dealership, ContractCollection contracts, PrintStream out, InputStream in) {
         this.dealership = dealership;
+        this.contracts = contracts;
         this.out = out;
         scanner = new Scanner(in);
     }

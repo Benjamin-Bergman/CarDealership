@@ -1,0 +1,41 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+type: object
+properties:
+  sales:
+    type: array
+    items:
+      $ref: '#/definitions/Sale'
+  leases:
+    type: array
+    items:
+      $ref: '#/definitions/Lease'
+required:
+  - sales
+  - leases
+definitions:
+  Lease:
+    type: object
+    properties:
+      date:
+        type: string
+        format: "date"
+      name:
+        type: string
+      email:
+        type: string
+      vin:
+        type: integer
+    required:
+      - date
+      - name
+      - email
+      - vin
+  Sale:
+    allOf:
+      - $ref: '#/definitions/Lease'
+      - type: object
+        properties:
+          financed:
+            type: boolean
+        required:
+          - 'financed'
