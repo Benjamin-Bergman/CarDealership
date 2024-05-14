@@ -25,25 +25,18 @@ public class FileBackedContractList implements ContractCollection {
     }
 
     @Override
-    public Collection<Lease> getLeases() {
-        return Collections.unmodifiableList(list.getLeases());
+    public Collection<Entry> getLeases() {
+        return Collections.unmodifiableList(list);
     }
 
     @Override
-    public Collection<Sale> getSales() {
-        return Collections.unmodifiableList(list.getSales());
+    public Collection<Entry> getSales() {
+        return Collections.unmodifiableList(list);
     }
 
     @Override
-    public boolean addLease(Lease lease) {
-        list.getLeases().add(lease);
-        writeToFile();
-        return true;
-    }
-
-    @Override
-    public boolean addSale(Sale sale) {
-        list.getSales().add(sale);
+    public boolean add(Entry entry) {
+        list.add(entry);
         writeToFile();
         return true;
     }

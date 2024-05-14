@@ -1,2 +1,5 @@
-sales: [ ]
-leases: [ ]
+- date: 1990-01-01
+  name: NAME
+  email: EMAIL
+  vin: 00000
+  type: Lease

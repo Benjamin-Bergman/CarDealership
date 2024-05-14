@@ -9,28 +9,22 @@ import com.pluralsight.ContractListSchema.*;
 import java.util.*;
 
 /**
- * Represents a mutable collection of {@link Sale}s and {@link Lease}s.
+ * Represents a mutable collection of {@link Entry}s.
  */
 public interface ContractCollection {
     /**
      * @return An unmodifiable view of leases
      */
-    Collection<Lease> getLeases();
+    Collection<Entry> getLeases();
 
     /**
      * @return An unmodifiable view of sales
      */
-    Collection<Sale> getSales();
+    Collection<Entry> getSales();
 
     /**
-     * @param lease A lease to add
+     * @param entry An entry to add
      * @return {@code true} on success
      */
-    boolean addLease(Lease lease);
-
-    /**
-     * @param sale A sale to add
-     * @return {@code true} on success
-     */
-    boolean addSale(Sale sale);
+    boolean add(Entry entry);
 }

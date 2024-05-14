@@ -1,24 +1,22 @@
 $schema: https://json-schema.org/draft/2020-12/schema
-type: object
-properties:
-  sales:
-    type: array
-    items:
-      $ref: '#/definitions/Sale'
-  leases:
-    type: array
-    items:
-      $ref: '#/definitions/Lease'
+type: array
+items:
+  $ref: '#/definitions/Entry'
 required:
   - sales
   - leases
 definitions:
-  Lease:
+  Entry:
     type: object
     properties:
+      type:
+        enum:
+          - Lease
+          - Sale
+          - SaleFinanced
       date:
         type: string
-        format: "date"
+        format: date
       name:
         type: string
       email:
@@ -30,23 +28,4 @@ definitions:
       - name
       - email
       - vin
-  Sale:
-    type: object
-    properties:
-      financed:
-        type: boolean
-      date:
-        type: string
-        format: "date"
-      name:
-        type: string
-      email:
-        type: string
-      vin:
-        type: integer
-    required:
-      - date
-      - name
-      - email
-      - vin
-      - financed
+      - type
