@@ -19,6 +19,11 @@ final class Program {
 
         var contracts = new FileBackedContractList(CONTRACTS_PATH);
 
+//        ContractListSchema.Entry en = ContractListSchema.Entry
+//            .create(LocalDate.now(), "", "", 12345, type.Lease, 100);
+
+        //System.out.println(en.getTotalPrice());
+
         try (var ui = new DealershipUI(dealership, contracts, System.out, System.in)) {
             ui.display();
         }

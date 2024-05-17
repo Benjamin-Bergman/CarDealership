@@ -14,6 +14,8 @@ definitions:
           - Lease
           - Sale
           - SaleFinanced
+      basePrice:
+        type: double
       date:
         type: string
         format: date
@@ -29,3 +31,4 @@ definitions:
       - email
       - vin
       - type
+      - basePrice
