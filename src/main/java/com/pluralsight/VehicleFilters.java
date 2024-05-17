@@ -4,8 +4,8 @@
 
 package com.pluralsight;
 
-import java.util.*;
 import java.util.function.*;
+import java.util.stream.*;
 
 /**
  * A collection of common {@link Predicate}s for filtering {@link Vehicle}s.
@@ -123,8 +123,7 @@ public final class VehicleFilters {
      * @param list The contracts to check
      * @return A Predicate applying the condition
      */
-    public static Predicate<Vehicle> available(Collection<? extends Contract> list) {
-        return v ->
-            list.stream().noneMatch(sale -> sale.vehicleSold.vin() == v.vin());
+    public static Predicate<Vehicle> available(Iterable<? extends Contract> list) {
+        return v -> StreamSupport.stream(list.spliterator(), true).noneMatch(sale -> sale.vehicleSold.vin() == v.vin());
     }
 }

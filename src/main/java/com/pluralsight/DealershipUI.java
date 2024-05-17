@@ -20,7 +20,7 @@ public final class DealershipUI implements Closeable {
     private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$?(\\d*(?:\\.\\d\\d?)?)$");
     private static final Predicate<String> INT_PATTERN = Pattern.compile("^\\d+$").asPredicate();
     private final Dealership dealership;
-    private final List<? extends Contract> contracts;
+    private final SimpleList<? extends Contract> contracts;
     private final Scanner scanner;
     private final PrintStream out;
 
@@ -31,9 +31,9 @@ public final class DealershipUI implements Closeable {
      * @param out        The output stream to write to
      * @param in         The input stream to read from
      */
-    public DealershipUI(Dealership dealership, List<? extends Contract> contracts, PrintStream out, InputStream in) {
+    public DealershipUI(Dealership dealership, SimpleList<? extends Contract> contracts, PrintStream out, InputStream in) {
         this.dealership = dealership;
-        this.contracts = new ArrayList<>(contracts);
+        this.contracts = contracts;
         this.out = out;
         scanner = new Scanner(in);
     }

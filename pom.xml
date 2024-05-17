@@ -31,6 +31,11 @@
             <version>${manifold.version}</version>
         </dependency>
         <dependency>
+            <groupId>systems.manifold</groupId>
+            <artifactId>manifold-delegation-rt</artifactId>
+            <version>${manifold.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.11.0-M1</version>
@@ -65,6 +70,11 @@
                         <path>
                             <groupId>systems.manifold</groupId>
                             <artifactId>manifold-props</artifactId>
+                            <version>${manifold.version}</version>
+                        </path>
+                        <path>
+                            <groupId>systems.manifold</groupId>
+                            <artifactId>manifold-delegation</artifactId>
                             <version>${manifold.version}</version>
                         </path>
                     </annotationProcessorPaths>

@@ -5,11 +5,11 @@
 package com.pluralsight;
 
 import java.io.*;
-import java.util.*;
 
 @SuppressWarnings("UtilityClass")
 final class Program {
     private static final File FILE_PATH = new File("inventory.csv");
+    private static final File CONTRACT_PATH = new File("contracts.csv");
 
     public static void main(String[] args) {
         var dealership = new ResourceBackedDealership(
@@ -17,7 +17,7 @@ final class Program {
             () -> new FileReader(FILE_PATH),
             append -> new FileWriter(FILE_PATH, append));
 
-        try (var ui = new DealershipUI(dealership, List.of(), System.out, System.in)) {
+        try (var ui = new DealershipUI(dealership, new FileBackedContractList(CONTRACT_PATH), System.out, System.in)) {
             ui.display();
         }
     }
