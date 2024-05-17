@@ -5,6 +5,7 @@
 package com.pluralsight;
 
 import java.io.*;
+import java.time.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.regex.*;
@@ -20,7 +21,7 @@ public final class DealershipUI implements Closeable {
     private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$?(\\d*(?:\\.\\d\\d?)?)$");
     private static final Predicate<String> INT_PATTERN = Pattern.compile("^\\d+$").asPredicate();
     private final Dealership dealership;
-    private final SimpleList<? extends Contract> contracts;
+    private final SimpleList<Contract> contracts;
     private final Scanner scanner;
     private final PrintStream out;
 
@@ -31,7 +32,7 @@ public final class DealershipUI implements Closeable {
      * @param out        The output stream to write to
      * @param in         The input stream to read from
      */
-    public DealershipUI(Dealership dealership, SimpleList<? extends Contract> contracts, PrintStream out, InputStream in) {
+    public DealershipUI(Dealership dealership, SimpleList<Contract> contracts, PrintStream out, InputStream in) {
         this.dealership = dealership;
         this.contracts = contracts;
         this.out = out;
@@ -58,6 +59,7 @@ public final class DealershipUI implements Closeable {
                 --OTHER--
                 8 - Add vehicle
                 9 - Remove vehicle
+                10 - Buy vehicle
                 99 - Exit
                 Choose an option:\s""");
             var input = scanner.nextLine().trim();
@@ -70,6 +72,7 @@ public final class DealershipUI implements Closeable {
             switch (input) {
                 case "8" -> addVehicle();
                 case "9" -> removeVehicle();
+                case "10" -> processSale();
                 case "99" -> {
                     break loop;
                 }
@@ -85,7 +88,46 @@ public final class DealershipUI implements Closeable {
         scanner.close();
     }
 
-    @SuppressWarnings({"MethodWithMultipleLoops", "OverlyComplexMethod"})
+    @SuppressWarnings("ReassignedVariable")
+    private void processSale() {
+        //noinspection HardcodedFileSeparator
+        System.out.print("Is this a sale? [y/n] ");
+        var sale = queryYN();
+        Vehicle vehicle;
+        do {
+            var vin = queryIntValue("VIN", null);
+            //noinspection ObjectAllocationInLoop
+            vehicle = dealership.allVehicles.stream().filter(v -> v.vin() == vin).findFirst()
+                .orElseGet(() -> {
+                    System.out.println("Couldn't find that vehicle. Try again.");
+                    return null;
+                });
+            //noinspection ObjectAllocationInLoop
+            if (!sale && vehicle != null && vehicle.year() + 3 < LocalDate.now().year) {
+                //noinspection AssignmentToNull
+                vehicle = null;
+                System.out.println("That vehicle is too old to lease. Try again.");
+            }
+        }
+        while (vehicle == null);
+        var name = queryStringValue("customer's name", false);
+        var email = queryStringValue("customer's email address", false);
+        if (sale) {
+            //noinspection HardcodedFileSeparator
+            System.out.print("Is this financed? [y/n] ");
+            var financed = queryYN();
+            var contract = new SalesContract(vehicle, email, name, 0.05, 100, vehicle.price() < 10_000 ? 295 : 495, financed);
+            contracts.add(contract);
+            System.out.println("Sold vehicle #${vehicle.vin()} to $name at $email " + (financed ? "with financing." : "without financing."));
+        } else {
+            var contract = new LeaseContract(vehicle, email, name, vehicle.price() / 2, vehicle.price() * 0.07);
+            contracts.add(contract);
+            System.out.println("Leased vehicle #${vehicle.vin()} to $name at $email.");
+        }
+
+        readKey();
+    }
+
     private void removeVehicle() {
         var filter = queryArbitraryFilter() & VehicleFilters.available(contracts);
 
@@ -111,19 +153,7 @@ public final class DealershipUI implements Closeable {
                 : "Found ${found.size()} matching vehicles. Remove all of them? [y/n] "
         );
 
-        boolean shouldDelete;
-        while (true) {
-            var input = scanner.nextLine().trim().toLowerCase();
-            if ("y".equals(input) || "n".equals(input)
-                || "yes".equals(input) || "no".equals(input)) {
-                shouldDelete = "y".equals(input) || "yes".equals(input);
-                break;
-            }
-            //noinspection HardcodedFileSeparator
-            out.print("Unknown option \"$input\". Try again: [y/n] ");
-        }
-
-        if (shouldDelete) {
+        if (queryYN()) {
             for (var v : found)
                 dealership.remove(v);
             out.println("Removed ${found.size()} vehicles.");
@@ -131,6 +161,17 @@ public final class DealershipUI implements Closeable {
             out.println("Nothing removed.");
 
         readKey();
+    }
+
+    private boolean queryYN() {
+        while (true) {
+            var input = scanner.nextLine().trim().toLowerCase();
+            if ("y".equals(input) || "n".equals(input)
+                || "yes".equals(input) || "no".equals(input))
+                return "y".equals(input) || "yes".equals(input);
+            //noinspection HardcodedFileSeparator
+            out.print("Unknown option \"$input\". Try again: [y/n] ");
+        }
     }
 
     private Predicate<Vehicle> queryArbitraryFilter() {
