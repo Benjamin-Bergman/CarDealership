@@ -12,7 +12,7 @@ import java.util.regex.*;
 import java.util.stream.*;
 
 /**
- * Represents a user interface for interacting with a {@link Dealership}.
+ * Represents a user interface for interacting with a {@link Dealership} and a {@link SimpleList} of {@link Contract}s.
  */
 @SuppressWarnings("FeatureEnvy")
 public final class DealershipUI implements Closeable {
@@ -29,6 +29,7 @@ public final class DealershipUI implements Closeable {
      * Creates a new instance of the UI.
      *
      * @param dealership The dealership this UI controls
+     * @param contracts  The collection of contracts to use.
      * @param out        The output stream to write to
      * @param in         The input stream to read from
      */
