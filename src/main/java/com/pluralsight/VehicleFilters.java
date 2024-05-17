@@ -4,6 +4,7 @@
 
 package com.pluralsight;
 
+import java.util.*;
 import java.util.function.*;
 
 /**
@@ -114,5 +115,16 @@ public final class VehicleFilters {
      */
     public static Predicate<Vehicle> all() {
         return v -> true;
+    }
+
+    /**
+     * Allows vehicles that have not been sold or leased.
+     *
+     * @param list The contracts to check
+     * @return A Predicate applying the condition
+     */
+    public static Predicate<Vehicle> available(Collection<? extends Contract> list) {
+        return v ->
+            list.stream().noneMatch(sale -> sale.vehicleSold.vin() == v.vin());
     }
 }

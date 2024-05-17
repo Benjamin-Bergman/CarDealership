@@ -20,6 +20,7 @@ public final class DealershipUI implements Closeable {
     private static final Pattern MONEY_PATTERN = Pattern.compile("^\\$?(\\d*(?:\\.\\d\\d?)?)$");
     private static final Predicate<String> INT_PATTERN = Pattern.compile("^\\d+$").asPredicate();
     private final Dealership dealership;
+    private final List<? extends Contract> contracts;
     private final Scanner scanner;
     private final PrintStream out;
 
@@ -30,8 +31,9 @@ public final class DealershipUI implements Closeable {
      * @param out        The output stream to write to
      * @param in         The input stream to read from
      */
-    public DealershipUI(Dealership dealership, PrintStream out, InputStream in) {
+    public DealershipUI(Dealership dealership, List<? extends Contract> contracts, PrintStream out, InputStream in) {
         this.dealership = dealership;
+        this.contracts = new ArrayList<>(contracts);
         this.out = out;
         scanner = new Scanner(in);
     }
@@ -85,7 +87,7 @@ public final class DealershipUI implements Closeable {
 
     @SuppressWarnings({"MethodWithMultipleLoops", "OverlyComplexMethod"})
     private void removeVehicle() {
-        var filter = queryArbitraryFilter();
+        var filter = queryArbitraryFilter() & VehicleFilters.available(contracts);
 
         var found = dealership
             .getAllVehicles()
@@ -208,7 +210,7 @@ public final class DealershipUI implements Closeable {
             case "7" -> VehicleFilters.all();
             default -> //noinspection ProhibitedExceptionThrown
                 throw new RuntimeException("Unreachable");
-        };
+        } & VehicleFilters.available(contracts);
     }
 
     private int queryIntValue(String which, Integer defaultValue) {

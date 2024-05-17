@@ -5,6 +5,7 @@
 package com.pluralsight;
 
 import java.io.*;
+import java.util.*;
 
 @SuppressWarnings("UtilityClass")
 final class Program {
@@ -16,7 +17,7 @@ final class Program {
             () -> new FileReader(FILE_PATH),
             append -> new FileWriter(FILE_PATH, append));
 
-        try (var ui = new DealershipUI(dealership, System.out, System.in)) {
+        try (var ui = new DealershipUI(dealership, List.of(), System.out, System.in)) {
             ui.display();
         }
     }
