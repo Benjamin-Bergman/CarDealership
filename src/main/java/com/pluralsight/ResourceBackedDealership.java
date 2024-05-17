@@ -57,7 +57,7 @@ public final class ResourceBackedDealership implements Dealership {
 
             var items =
                 br.lines()
-                    .map(ResourceBackedDealership::parseLine)
+                    .map(Vehicle::fromCSV)
                     .toList();
 
             anyInvalid = items.contains(null);
@@ -77,55 +77,6 @@ public final class ResourceBackedDealership implements Dealership {
 
     private static boolean isValid(String str) {
         return str != null && !str.isEmpty();
-    }
-
-    private static Vehicle parseLine(String s) {
-        assert s != null : "s comes from BufferedReader.lines()";
-        var parts = s.split("\\|");
-        if (parts.length != 8)
-            return null;
-        var vin = parseInt(parts[0]);
-        if (vin.isEmpty())
-            return null;
-        var year = parseInt(parts[1]);
-        if (year.isEmpty())
-            return null;
-        var odometer = parseInt(parts[6]);
-        if (odometer.isEmpty())
-            return null;
-        var price = parseDouble(parts[7]);
-        if (price.isEmpty())
-            return null;
-
-        return new Vehicle(vin.getAsInt(), year.getAsInt(),
-            parts[2], parts[3],
-            parts[4], parts[5],
-            odometer.getAsInt(), price.getAsDouble());
-    }
-
-    private static OptionalInt parseInt(String s) {
-        try {
-            return OptionalInt.of(Integer.parseInt(s));
-        } catch (NumberFormatException e) {
-            return OptionalInt.empty();
-        }
-    }
-
-    private static OptionalDouble parseDouble(String s) {
-        try {
-            return OptionalDouble.of(Double.parseDouble(s));
-        } catch (NumberFormatException e) {
-            return OptionalDouble.empty();
-        }
-    }
-
-    @SuppressWarnings("FeatureEnvy")
-    private static String serialize(Vehicle v) {
-        return "%d|%d|%s|%s|%s|%s|%d|%.2f".formatted(
-            v.vin(), v.year(),
-            v.make(), v.model(),
-            v.vehicleType(), v.color(),
-            v.odometer(), v.price());
     }
 
     @Override
@@ -154,7 +105,7 @@ public final class ResourceBackedDealership implements Dealership {
         try (var fw = writer.apply(true);
              var bw = new BufferedWriter(fw)) {
             bw.newLine();
-            bw.write(serialize(vehicle));
+            bw.write(vehicle.toCSV());
         }
     }
 
@@ -165,7 +116,7 @@ public final class ResourceBackedDealership implements Dealership {
              var bw = new BufferedWriter(fw)) {
             for (var v : vehicles) {
                 bw.newLine();
-                bw.write(serialize(v));
+                bw.write(v.toCSV());
             }
         }
     }
@@ -193,7 +144,7 @@ public final class ResourceBackedDealership implements Dealership {
             bw.write(phone);
             for (var v : getAllVehicles()) {
                 bw.newLine();
-                bw.write(serialize(v));
+                bw.write(v.toCSV());
             }
         }
     }
