@@ -31,4 +31,4 @@ Follow these steps to get your application running within IntelliJ IDEA:
 
 ## Class Diagram
 
-![image](https://github.com/Benjamin-Bergman/CarDealership/assets/166551442/9464fc00-6cb7-434c-8fda-4dfce22b0ef5)
+![image](https://github.com/Benjamin-Bergman/CarDealership/assets/166551442/fab61fe7-9ef5-43c7-a168-15b82ae698ef)
