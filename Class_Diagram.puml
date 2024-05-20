@@ -155,10 +155,20 @@ together {
 Dealership *-- ResourceBackedDealership
 Vehicle o-r- Dealership
 DealershipUI <-u- Program
-Dealership o-- DealershipUI
+Dealership o-l- DealershipUI
 SimpleList o-- DealershipUI
 VehicleFilters <-u- DealershipUI
-Dealership <|.. BasicDealership
+Dealership <|.r. BasicDealership
 Contract o-- FileBackedContractList
 Contracts <-u- FileBackedContractList
+Contracts --> SalesContract
+Contracts --> LeaseContract
+Vehicle <-- VehicleFilters
+
+legend top right
+Arrows with a solid head indicate direct usage.
+endlegend
+
+note top of BaseContract: Package Private
+note right of Program: Package Private\nDirectly instantiates many classes for dependency injection
 @enduml
